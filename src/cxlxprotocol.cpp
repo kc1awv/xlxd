@@ -465,15 +465,14 @@ bool CXlxProtocol::OnDvHeaderPacketIn(CDvHeaderPacket *Header, const CIp &Ip)
     return newstream;
 }
 
-void CXlxProtocol::OnDvLastFramePacketIn(CDvLastFramePacket *DvFrame, const CIp *Ip)
+void CXlxProtocol::OnDvFramePacketIn(CDvFramePacket *DvFrame, const CIp *Ip)
 {
     // tag packet as remote peer origin
     DvFrame->SetRemotePeerOrigin();
-    
-    // anc call base class
-    CDextraProtocol::OnDvLastFramePacketIn(DvFrame, Ip);
-}
 
+    // anc call base class
+    CDextraProtocol::OnDvFramePacketIn(DvFrame, Ip);
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // packet decoding helpers
