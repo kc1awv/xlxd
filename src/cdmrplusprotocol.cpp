@@ -83,7 +83,7 @@ void CDmrplusProtocol::Task(void)
     char                ToLinkModule;
     CDvHeaderPacket     *Header;
     CDvFramePacket      *Frames[3];
-    int                 CloseStreamFrameNr = -1
+    int                 CloseStreamFrameNr = -1;
     
     // handle incoming packets
     if ( m_Socket.Receive(&Buffer, &Ip, 20) != -1 )
