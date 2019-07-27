@@ -71,7 +71,7 @@ void CXlxProtocol::Task(void)
     CVersion            Version;
     CDvHeaderPacket     *Header;
     CDvFramePacket      *Frame;
-    CDvLastFramePacket  *LastFrame;
+    CDvLastFramePacket  *LastFrame = NULL;
     
     // any incoming packet ?
     if ( m_Socket.Receive(&Buffer, &Ip, 20) != -1 )
@@ -104,8 +104,10 @@ void CXlxProtocol::Task(void)
         {
             //std::cout << "XLX (DExtra) DV last frame" << std::endl;
             
-            // handle it
-            OnDvLastFramePacketIn(LastFrame, &Ip);
+            // tag packet as remote peer origin
+            LastFrame->SetRemotePeerOrigin();
+
+            OnDvFramePacketIn((CDvFramePacket *)LastFrame, &Ip);
         }
         else if ( IsValidConnectPacket(Buffer, &Callsign, Modules, &Version) )
         {
@@ -218,6 +220,11 @@ void CXlxProtocol::Task(void)
     
     // handle queue from reflector
     HandleQueue();
+    
+    if ( LastFrame != NULL )
+    {
+        CloseStreamForDvLastFramePacket(LastFrame, &Ip);
+    }
     
     // keep alive
     if ( m_LastKeepaliveTime.DurationSinceNow() > XLX_KEEPALIVE_PERIOD )
@@ -462,20 +469,10 @@ void CXlxProtocol::OnDvFramePacketIn(CDvFramePacket *DvFrame, const CIp *Ip)
 {
     // tag packet as remote peer origin
     DvFrame->SetRemotePeerOrigin();
-    
+
     // anc call base class
     CDextraProtocol::OnDvFramePacketIn(DvFrame, Ip);
 }
-
-void CXlxProtocol::OnDvLastFramePacketIn(CDvLastFramePacket *DvFrame, const CIp *Ip)
-{
-    // tag packet as remote peer origin
-    DvFrame->SetRemotePeerOrigin();
-    
-    // anc call base class
-    CDextraProtocol::OnDvLastFramePacketIn(DvFrame, Ip);
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // packet decoding helpers
